@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buku Sederhana</title>
+    <link href="https://fonts.cdnfonts.com/css/sf-pro-display" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-image: url('assets/background.webp');
+            background-size: cover;
+            background-position: center;
+            overflow: hidden;
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            position: relative;
+            flex-direction: column;
+        }
+        .book-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            width: 100%;
+        }
+        .book {
+            width: 270px; /* 9:16 ratio, scalable */
+            height: 480px;
+            position: relative;
+            perspective: 1200px;
+            cursor: pointer;
+            z-index: 10;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            outline: none;
+            touch-action: pan-x; /* Izinkan pan horizontal */
+        }
+        .book-cover, .page, .left-page {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform-origin: left;
+            transition: transform 1.5s cubic-bezier(0.25, 0.1, 0.25, 1), box-shadow 1.5s ease;
+            backface-visibility: hidden;
+            pointer-events: auto;
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+            image-rendering: crisp-edges;
+        }
+        .book-cover {
+            background-image: url('assets/tampilan.webp');
+            background-size: cover;
+            background-position: center;
+            border: 2px solid #654321;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* Shadow lebih halus */
+            z-index: 11;
+        }
+        .page {
+            background-size: cover;
+            background-position: center;
+            border: 1px solid #ccc;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* Shadow lebih halus */
+        }
+        .left-page {
+            background-size: cover;
+            background-position: center;
+            border: 1px solid #ccc;
+            box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.1); /* Shadow lebih halus */
+            z-index: 0;
+            transform: rotateY(0deg);
+        }
+        .page-1 { background-image: url('assets/1.webp'); z-index: 10; }
+        .page-2 { background-image: url('assets/2.webp'); z-index: 9; }
+        .page-3 { background-image: url('assets/3.webp'); z-index: 8; }
+        .page-4 { background-image: url('assets/4.webp'); z-index: 7; }
+        .page-5 { background-image: url('assets/5.webp'); z-index: 6; }
+        .page-6 { background-image: url('assets/6.webp'); z-index: 5; }
+        .page-7 { background-image: url('assets/7.webp'); z-index: 4; }
+        .page-8 { background-image: url('assets/8.webp'); z-index: 3; }
+        .page-9 { background-image: url('assets/9.webp'); z-index: 2; }
+        .page-10 { background-image: url('assets/10.webp'); z-index: 1; }
+        .left-page-1 { background-image: url('assets/kosong1.webp'); }
+        .left-page-2 { background-image: url('assets/kosong2.webp'); }
+        .left-page-3 { background-image: url('assets/kosong3.webp'); }
+        .left-page-4 { background-image: url('assets/kosong4.webp'); }
+        .left-page-5 { background-image: url('assets/kosong5.webp'); }
+        .left-page-6 { background-image: url('assets/kosong6.webp'); }
+        .left-page-7 { background-image: url('assets/kosong7.webp'); }
+        .left-page-8 { background-image: url('assets/kosong8.webp'); }
+        .left-page-9 { background-image: url('assets/kosong9.webp'); }
+        .left-page-10 { background-image: url('assets/kosong10.webp'); }
+        .open .book-cover { transform: rotateY(-180deg); box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.1); }
+        .flip-1 .page-1 { transform: rotateY(-180deg); box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.1); }
+        .flip-2 .page-2 { transform: rotateY(-180deg); box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.1); }
+        .flip-3 .page-3 { transform: rotateY(-180deg); box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.1); }
+        .flip-4 .page-4 { transform: rotateY(-180deg); box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.1); }
+        .flip-5 .page-5 { transform: rotateY(-180deg); box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.1); }
+        .flip-6 .page-6 { transform: rotateY(-180deg); box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.1); }
+        .flip-7 .page-7 { transform: rotateY(-180deg); box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.1); }
+        .flip-8 .page-8 { transform: rotateY(-180deg); box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.1); }
+        .flip-9 .page-9 { transform: rotateY(-180deg); box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.1); }
+        .flip-10 .page-10 { transform: rotateY(-180deg); box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.1); }
+        .reset .book-cover, 
+        .reset .page-1, 
+        .reset .page-2, 
+        .reset .page-3, 
+        .reset .page-4, 
+        .reset .page-5, 
+        .reset .page-6, 
+        .reset .page-7, 
+        .reset .page-8, 
+        .reset .page-9, 
+        .reset .page-10 {
+            transform: rotateY(0deg);
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        /* Media Queries untuk Desktop */
+        @media (min-width: 769px) {
+            .book {
+                width: 540px; /* 9:16 scaled up */
+                height: 960px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="book-container">
+        <div class="book" ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" ontouchend="handleTouchEnd(event)">
+            <div class="book-cover"></div>
+            <div class="left-page left-page-1"></div>
+            <div class="page page-1"></div>
+            <div class="left-page left-page-2"></div>
+            <div class="page page-2"></div>
+            <div class="left-page left-page-3"></div>
+            <div class="page page-3"></div>
+            <div class="left-page left-page-4"></div>
+            <div class="page page-4"></div>
+            <div class="left-page left-page-5"></div>
+            <div class="page page-5"></div>
+            <div class="left-page left-page-6"></div>
+            <div class="page page-6"></div>
+            <div class="left-page left-page-7"></div>
+            <div class="page page-7"></div>
+            <div class="left-page left-page-8"></div>
+            <div class="page page-8"></div>
+            <div class="left-page left-page-9"></div>
+            <div class="page page-9"></div>
+            <div class="left-page left-page-10"></div>
+            <div class="page page-10"></div>
+        </div>
+    </div>
+
+    <script>
+        const book = document.querySelector('.book');
+        const audio = document.getElementById('backgroundMusic');
+        let currentPage = 0;
+        let musicPlayed = false;
+        let touchStartX = 0;
+        let touchMoveX = 0;
+
+        function handleTouchStart(event) {
+            touchStartX = event.touches[0].clientX;
+        }
+
+        function handleTouchMove(event) {
+            touchMoveX = event.touches[0].clientX;
+        }
+
+        function handleTouchEnd(event) {
+            const deltaX = touchMoveX - touchStartX;
+            const threshold = 50; // Jarak minimum buat deteksi geser
+
+            if (deltaX > threshold && currentPage > 0) {
+                goBack(); // Geser ke kanan, balik halaman
+            } else if (deltaX < -threshold && currentPage < 11) {
+                turnPage(); // Geser ke kiri, lanjut halaman
+            }
+        }
+
+        function turnPage() {
+            if (currentPage < 11) {
+                currentPage++;
+                if (currentPage === 1 && !musicPlayed) {
+                    audio.play();
+                    musicPlayed = true;
+                }
+                if (currentPage === 1) {
+                    book.classList.add('open');
+                } else {
+                    book.classList.add(`flip-${currentPage - 1}`);
+                }
+            }
+        }
+
+        function goBack() {
+            if (currentPage > 0) {
+                if (currentPage === 1) {
+                    book.classList.remove('open');
+                } else {
+                    book.classList.remove(`flip-${currentPage - 1}`);
+                }
+                currentPage--;
+            }
+        }
+
+        function resetBook() {
+            book.classList.remove('open', 'flip-1', 'flip-2', 'flip-3', 'flip-4', 'flip-5', 'flip-6', 'flip-7', 'flip-8', 'flip-9', 'flip-10');
+            currentPage = 0;
+        }
+    </script>
+    <audio id="backgroundMusic" src="assets/music.mp3" preload="auto" loop></audio>
+</body>
+</html>
